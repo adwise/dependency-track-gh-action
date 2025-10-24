@@ -32,7 +32,8 @@ async function run(): Promise<void> {
         while (!analysisCompleted && secondsBetweenDates(end, start) < timeoutInSecs) {
             console.log("calling hasBOMAnalysisCompleted");
             analysisCompleted = await hasBOMAnalysisCompleted(dependecyTrackInputs, bomUploadToken);
-            sleep(1000);
+            await sleep(1000);
+            end = new Date();
         }
 
         if (!analysisCompleted) {
