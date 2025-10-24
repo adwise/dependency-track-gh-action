@@ -157,7 +157,7 @@ const util_1 = __nccwpck_require__(4024);
 function uploadBomFileToDepndencyTrack(input) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        core.info(`Reading BOM: ${input.bomFilePath}...`);
+        core.debug(`Reading BOM: ${input.bomFilePath}...`);
         const bomContentsBuffer = (0, fs_1.readFileSync)(input.bomFilePath);
         let base64EncodedBomContents = Buffer.from(bomContentsBuffer).toString('base64');
         if (base64EncodedBomContents.startsWith('77u/')) {
@@ -451,6 +451,8 @@ function run() {
             if (!dependecyTrackInputs.projectName) {
                 throw new Error('projectName input is required');
             }
+            core.info('Using dependency track server: ' + dependecyTrackInputs.serverHostBaseUrl);
+            core.info('Uploading the following BOM file to dependency track server: ' + dependecyTrackInputs.bomFilePath);
             // upload bom to dependency track server
             const bomUploadToken = (yield (0, dependencyTrack_1.uploadBomFileToDepndencyTrack)(dependecyTrackInputs)).token;
             // call hasBOMAnalysisCompleted every second, until timeout(in seconds) and then get out
@@ -459,7 +461,7 @@ function run() {
             let end = new Date();
             let analysisCompleted = false;
             while (!analysisCompleted && (0, util_2.secondsBetweenDates)(end, start) < timeoutInSecs) {
-                core.info("calling hasBOMAnalysisCompleted");
+                core.debug('calling hasBOMAnalysisCompleted');
                 analysisCompleted = yield (0, dependencyTrack_1.hasBOMAnalysisCompleted)(dependecyTrackInputs, bomUploadToken);
                 yield (0, util_2.sleep)(1000);
                 end = new Date();
@@ -467,9 +469,15 @@ function run() {
             if (!analysisCompleted) {
                 throw new Error(`Bom analysis wasn't completed within timeout of ${timeoutInSecs} seconds`);
             }
+            core.info('BOM analysis completed successfully.');
             // Get project vulnerability findings
             const projectFindings = yield (0, dependencyTrack_1.getProjectFindings)(dependecyTrackInputs);
-            core.info("Project vulneribility findings are below. \n " + JSON.stringify(projectFindings));
+            if (projectFindings.length) {
+                core.info('Project vulneribility findings are below. \n ' + JSON.stringify(projectFindings));
+            }
+            else {
+                core.info('No project vulnerability findings found.');
+            }
             // Convert projectFindings into markdown
             const commentBody = convertProjectFindingsToMarkdown(projectFindings);
             // create or update comment on PR
@@ -484,7 +492,6 @@ function run() {
                     core.setFailed(`Found CVE vulnerabilities in project with severity level ${severityLevel} and above.`);
                 }
             }
-            core.setFailed('');
         }
         catch (error) {
             core.info((0, util_1.inspect)(error));
@@ -496,28 +503,28 @@ function doesProjectHaveSeverityVuln(projectFindings, failOnSeverityLevel) {
     for (const projectFinding of projectFindings) {
         switch (failOnSeverityLevel.toUpperCase()) {
             case 'CRITICAL': {
-                if (projectFinding.vulnerability.severity === "CRITICAL")
+                if (projectFinding.vulnerability.severity === 'CRITICAL')
                     return true;
                 break;
             }
             case 'HIGH': {
-                if (projectFinding.vulnerability.severity === "CRITICAL"
-                    || projectFinding.vulnerability.severity === "HIGH")
+                if (projectFinding.vulnerability.severity === 'CRITICAL'
+                    || projectFinding.vulnerability.severity === 'HIGH')
                     return true;
                 break;
             }
             case 'MEDIUM': {
-                if (projectFinding.vulnerability.severity === "CRITICAL"
-                    || projectFinding.vulnerability.severity === "HIGH"
-                    || projectFinding.vulnerability.severity === "MEDIUM")
+                if (projectFinding.vulnerability.severity === 'CRITICAL'
+                    || projectFinding.vulnerability.severity === 'HIGH'
+                    || projectFinding.vulnerability.severity === 'MEDIUM')
                     return true;
                 break;
             }
             case 'LOW': {
-                if (projectFinding.vulnerability.severity === "CRITICAL"
-                    || projectFinding.vulnerability.severity === "HIGH"
-                    || projectFinding.vulnerability.severity === "MEDIUM"
-                    || projectFinding.vulnerability.severity === "LOW")
+                if (projectFinding.vulnerability.severity === 'CRITICAL'
+                    || projectFinding.vulnerability.severity === 'HIGH'
+                    || projectFinding.vulnerability.severity === 'MEDIUM'
+                    || projectFinding.vulnerability.severity === 'LOW')
                     return true;
                 break;
             }
@@ -531,11 +538,11 @@ function doesProjectHaveSeverityVuln(projectFindings, failOnSeverityLevel) {
 function convertProjectFindingsToMarkdown(projectFindings) {
     let commentBody = `## ${prCommentHeader} has completed. \n`;
     if (projectFindings && projectFindings.length == 0) {
-        commentBody = commentBody + "No vulnerabilities found by dependency track server";
+        commentBody = commentBody + 'No vulnerabilities found by dependency track server';
     }
     else {
-        commentBody = commentBody + "| Name | Version | Group | Vulnerability | Severity | CWE| \n";
-        commentBody = commentBody + "| --- | --- | --- | --- | --- | --- |\n";
+        commentBody = commentBody + '| Name | Version | Group | Vulnerability | Severity | CWE| \n';
+        commentBody = commentBody + '| --- | --- | --- | --- | --- | --- |\n';
         for (const projectFinding of projectFindings) {
             const name = projectFinding.component.name;
             const version = projectFinding.component.version;
@@ -569,7 +576,7 @@ function commentOnPullRequest(commentBody) {
                 body: commentBody,
                 editMode: 'replace'
             });
-            core.debug("PR comment with analysis results has been updated sucessfully.");
+            core.debug('PR comment with analysis results has been updated successfully.');
         }
         else {
             // create comment, by ommitting commentId and passing issueNumber (PR Number)
