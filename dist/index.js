@@ -195,6 +195,7 @@ function uploadBomFileToDepndencyTrack(input) {
             }
         }
         catch (error) {
+            bomApiPayload.bom = '<<omitted from logs>>';
             const context = {
                 status: (_a = error.response) === null || _a === void 0 ? void 0 : _a.status,
                 body: bomApiPayload
@@ -455,6 +456,7 @@ function run() {
             core.info('Uploading the following BOM file to dependency track server: ' + dependecyTrackInputs.bomFilePath);
             // upload bom to dependency track server
             const bomUploadToken = (yield (0, dependencyTrack_1.uploadBomFileToDepndencyTrack)(dependecyTrackInputs)).token;
+            core.info('Waiting for BOM analysis to complete.');
             // call hasBOMAnalysisCompleted every second, until timeout(in seconds) and then get out
             const timeoutInSecs = Number(core.getInput('timeoutInSecs'));
             const start = new Date();

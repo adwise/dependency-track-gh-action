@@ -35,6 +35,7 @@ async function run(): Promise<void> {
         // upload bom to dependency track server
         const bomUploadToken: string = (await uploadBomFileToDepndencyTrack(dependecyTrackInputs)).token;
 
+        core.info('Waiting for BOM analysis to complete.');
         // call hasBOMAnalysisCompleted every second, until timeout(in seconds) and then get out
         const timeoutInSecs: number = Number(core.getInput('timeoutInSecs'));
         const start = new Date();
