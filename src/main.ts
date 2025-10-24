@@ -30,6 +30,8 @@ async function run(): Promise<void> {
         }
 
         core.info('Using dependency track server: ' + dependecyTrackInputs.serverHostBaseUrl);
+        core.info('Using project name: ' + dependecyTrackInputs.projectName);
+        core.info('Using project version: ' + dependecyTrackInputs.projectVersion);
         core.info('Uploading the following BOM file to dependency track server: ' + dependecyTrackInputs.bomFilePath);
 
         // upload bom to dependency track server
