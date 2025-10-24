@@ -47,9 +47,9 @@ function createOrUpdateComment(inputs) {
             throw new Error("Repository value is undefined or invalid: " + repository);
         }
         const repo = repository.split("/");
-        console.log(`repository: ${repository}`);
+        core.debug(`repository: ${repository}`);
         const editMode = inputs.editMode ? inputs.editMode : "append";
-        console.log(`editMode: ${editMode}`);
+        core.info(`editMode: ${editMode}`);
         if (!["append", "replace"].includes(editMode)) {
             throw new Error(`Invalid edit-mode '${editMode}'.`);
         }
@@ -71,7 +71,7 @@ function createOrUpdateComment(inputs) {
                     commentBody = comment.body + "\n";
                 }
                 commentBody = commentBody + inputs.body;
-                console.log(`Comment body: ${commentBody}`);
+                core.debug(`Comment body: ${commentBody}`);
                 yield octokit.rest.issues.updateComment({
                     owner: repo[0],
                     repo: repo[1],
@@ -109,6 +109,25 @@ exports.createOrUpdateComment = createOrUpdateComment;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -123,6 +142,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.searchForProject = exports.getProjectFindings = exports.hasBOMAnalysisCompleted = exports.uploadBomFileToDepndencyTrack = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const axios_1 = __importDefault(__nccwpck_require__(6545));
 const fs_1 = __nccwpck_require__(7147);
 const util_1 = __nccwpck_require__(4024);
@@ -136,7 +156,7 @@ const util_1 = __nccwpck_require__(4024);
  */
 function uploadBomFileToDepndencyTrack(input) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(`Reading BOM: ${input.bomFilePath}...`);
+        core.info(`Reading BOM: ${input.bomFilePath}...`);
         const bomContentsBuffer = (0, fs_1.readFileSync)(input.bomFilePath);
         let base64EncodedBomContents = Buffer.from(bomContentsBuffer).toString('base64');
         if (base64EncodedBomContents.startsWith('77u/')) {
@@ -149,7 +169,7 @@ function uploadBomFileToDepndencyTrack(input) {
             bom: base64EncodedBomContents
         };
         const bomApiPayloadJsonString = JSON.stringify(bomApiPayload);
-        console.log(`BOM Api payload is data: ${bomApiPayloadJsonString}`);
+        core.debug(`BOM Api payload is data: ${bomApiPayloadJsonString}`);
         const requestConfig = {
             method: 'PUT',
             headers: {
@@ -162,13 +182,13 @@ function uploadBomFileToDepndencyTrack(input) {
         };
         const response = yield (0, axios_1.default)(requestConfig);
         if (response.status >= 200 && response.status < 300) {
-            console.log('Finished uploading BOM to Dependency-Track server.');
+            core.debug('Finished uploading BOM to Dependency-Track server.');
             const responseBody = response.data;
             return responseBody;
         }
         else {
-            console.log('Failed uploading BOM to Dependency-Track server. Response status code: ' + response.status + ', status text: ' + response.statusText);
-            console.log('Failed response data is ' + response.data);
+            core.debug('Failed uploading BOM to Dependency-Track server. Response status code: ' + response.status + ', status text: ' + response.statusText);
+            core.debug('Failed response data is ' + response.data);
             throw new Error('Failed to upload bom to dependency Track server');
         }
     });
@@ -191,13 +211,13 @@ function hasBOMAnalysisCompleted(input, bomUploadToken) {
         };
         const response = yield (0, axios_1.default)(requestConfig);
         if (response.status >= 200 && response.status < 300) {
-            console.log('Bom analysis status API call returned successfully for token: ' + bomUploadToken);
+            core.debug('Bom analysis status API call returned successfully for token: ' + bomUploadToken);
             const responseBody = response.data;
             return !responseBody.processing;
         }
         else {
-            console.log('Bom analysis status API call failed for token: ' + bomUploadToken + 'Response status code: ' + response.status + ', status text: ' + response.statusText);
-            console.log('Failed response data is ' + response.data);
+            core.debug('Bom analysis status API call failed for token: ' + bomUploadToken + 'Response status code: ' + response.status + ', status text: ' + response.statusText);
+            core.debug('Failed response data is ' + response.data);
             throw new Error('Bom analysis status API call failed.');
         }
     });
@@ -220,14 +240,14 @@ function getProjectFindings(input) {
         };
         const response = yield (0, axios_1.default)(requestConfig);
         if (response.status >= 200 && response.status < 300) {
-            console.log('Returned project findings for project: ' + input.projectName + ' and version: ' + input.projectVersion);
+            core.debug('Returned project findings for project: ' + input.projectName + ' and version: ' + input.projectVersion);
             const responseBody = response.data;
             return responseBody;
         }
         else {
-            console.log('Failed to return project findings for name: ' + input.projectName + ' and version: ' + input.projectVersion
+            core.debug('Failed to return project findings for name: ' + input.projectName + ' and version: ' + input.projectVersion
                 + '. Response status code: ' + response.status + ', status text: ' + response.statusText);
-            console.log('Failed response data is: ' + response.data);
+            core.debug('Failed response data is: ' + response.data);
             throw new Error('Failed to return project findings for name: ' + input.projectName + ' and version: ' + input.projectVersion);
         }
     });
@@ -249,14 +269,14 @@ function searchForProject(input) {
         };
         const response = yield (0, axios_1.default)(requestConfig);
         if (response.status >= 200 && response.status < 300) {
-            console.log('Found project for name: ' + input.projectName + ' and version: ' + input.projectVersion);
+            core.debug('Found project for name: ' + input.projectName + ' and version: ' + input.projectVersion);
             const responseBody = response.data;
             return responseBody;
         }
         else {
-            console.log('Failed to retrieve project for name: ' + input.projectName + ' and version: ' + input.projectVersion
+            core.debug('Failed to retrieve project for name: ' + input.projectName + ' and version: ' + input.projectVersion
                 + '. Response status code: ' + response.status + ', status text: ' + response.statusText);
-            console.log('Failed response data is: ' + response.data);
+            core.debug('Failed response data is: ' + response.data);
             throw new Error('Failed to retrieve project for name: ' + input.projectName + ' and version: ' + input.projectVersion);
         }
     });
@@ -423,7 +443,7 @@ function run() {
             let end = new Date();
             let analysisCompleted = false;
             while (!analysisCompleted && (0, util_2.secondsBetweenDates)(end, start) < timeoutInSecs) {
-                console.log("calling hasBOMAnalysisCompleted");
+                core.info("calling hasBOMAnalysisCompleted");
                 analysisCompleted = yield (0, dependencyTrack_1.hasBOMAnalysisCompleted)(dependecyTrackInputs, bomUploadToken);
                 yield (0, util_2.sleep)(1000);
                 end = new Date();
@@ -433,7 +453,7 @@ function run() {
             }
             // Get project vulnerability findings
             const projectFindings = yield (0, dependencyTrack_1.getProjectFindings)(dependecyTrackInputs);
-            console.log("Project vulneribility findings are below. \n " + JSON.stringify(projectFindings));
+            core.info("Project vulneribility findings are below. \n " + JSON.stringify(projectFindings));
             // Convert projectFindings into markdown
             const commentBody = convertProjectFindingsToMarkdown(projectFindings);
             // create or update comment on PR
@@ -450,7 +470,7 @@ function run() {
             }
         }
         catch (error) {
-            console.log((0, util_1.inspect)(error));
+            core.info((0, util_1.inspect)(error));
             core.setFailed(error.message);
         }
     });
@@ -521,7 +541,7 @@ function commentOnPullRequest(commentBody) {
             bodyIncludes: prCommentHeader,
             direction: 'first' //search direction. first/last
         };
-        console.log(`Inputs: ${(0, util_1.inspect)(inputs)}`);
+        core.debug(`Inputs: ${(0, util_1.inspect)(inputs)}`);
         const existingPRComment = yield (0, findComment_1.findComment)(inputs);
         if (existingPRComment) {
             // update comment, by passing existing PR analysis commentId and omitting issueNumber (PR Number)
@@ -532,7 +552,7 @@ function commentOnPullRequest(commentBody) {
                 body: commentBody,
                 editMode: 'replace'
             });
-            console.log("PR comment with analysis results has been updated sucessfully.");
+            core.debug("PR comment with analysis results has been updated sucessfully.");
         }
         else {
             // create comment, by ommitting commentId and passing issueNumber (PR Number)
