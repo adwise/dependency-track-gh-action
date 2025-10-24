@@ -29,9 +29,15 @@ async function run(): Promise<void> {
             throw new Error('projectName input is required');
         }
 
+        if (!dependecyTrackInputs.apiKey) {
+            throw new Error('apiKey input is required');
+        }
+
         core.info('Using dependency track server: ' + dependecyTrackInputs.serverHostBaseUrl);
         core.info('Using project name: ' + dependecyTrackInputs.projectName);
         core.info('Using project version: ' + dependecyTrackInputs.projectVersion);
+        core.info('Using apiKey (last 5 char only): ' + dependecyTrackInputs.apiKey.slice(-5));
+
         core.info('Uploading the following BOM file to dependency track server: ' + dependecyTrackInputs.bomFilePath);
 
         // upload bom to dependency track server
