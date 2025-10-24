@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
-import axios, { AxiosRequestConfig } from 'axios';
-import { readFileSync } from 'fs';
-import { stripTrailingSlash } from './util';
+import axios, {AxiosError, AxiosRequestConfig} from 'axios';
+import {readFileSync} from 'fs';
+import {stripTrailingSlash} from './util';
 
 export interface DependencyTrackInputs {
     serverHostBaseUrl: string
@@ -27,7 +27,6 @@ export interface UploadBomResponseBody {
 interface BomAnalysisStatusBody {
     processing: boolean
 }
-
 
 
 // --------------------------------------------------------//
@@ -77,7 +76,6 @@ export interface Attribution {
 // --------------------------------------------------------//
 
 
-
 /**
  * Uploads bom to dependency track server for analysis
  * @param input : dependency track inputs
@@ -112,16 +110,24 @@ export async function uploadBomFileToDepndencyTrack(input: DependencyTrackInputs
         url: stripTrailingSlash(input.serverHostBaseUrl) + '/api/v1/bom',
     }
 
-    const response = await axios(requestConfig);
+    try {
+        const response = await axios(requestConfig);
 
-    if (response.status >= 200 && response.status < 300) {
-        core.debug('Finished uploading BOM to Dependency-Track server.')
-        const responseBody: UploadBomResponseBody = response.data;
-        return responseBody;
-    } else {
-        core.debug('Failed uploading BOM to Dependency-Track server. Response status code: ' + response.status + ', status text: ' + response.statusText);
-        core.debug('Failed response data is ' + response.data);
-        throw new Error('Failed to upload bom to dependency Track server');
+        if (response.status >= 200 && response.status < 300) {
+            core.debug('Finished uploading BOM to Dependency-Track server.')
+            const responseBody: UploadBomResponseBody = response.data;
+            return responseBody;
+        } else {
+            core.debug('Failed uploading BOM to Dependency-Track server. Response status code: ' + response.status + ', status text: ' + response.statusText);
+            core.debug('Failed response data is ' + response.data);
+            throw new Error('Failed to upload bom to dependency Track server');
+        }
+    } catch (error: any) {
+        const context = {
+            status: error.response?.status,
+            body: bomApiPayload
+        };
+        throw new Error('Failed to upload bom to dependency Track server. ' + JSON.stringify(context));
     }
 }
 

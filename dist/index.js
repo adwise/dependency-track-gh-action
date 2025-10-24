@@ -155,6 +155,7 @@ const util_1 = __nccwpck_require__(4024);
  * @returns : BOM analysis token
  */
 function uploadBomFileToDepndencyTrack(input) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Reading BOM: ${input.bomFilePath}...`);
         const bomContentsBuffer = (0, fs_1.readFileSync)(input.bomFilePath);
@@ -180,16 +181,25 @@ function uploadBomFileToDepndencyTrack(input) {
             data: bomApiPayloadJsonString,
             url: (0, util_1.stripTrailingSlash)(input.serverHostBaseUrl) + '/api/v1/bom',
         };
-        const response = yield (0, axios_1.default)(requestConfig);
-        if (response.status >= 200 && response.status < 300) {
-            core.debug('Finished uploading BOM to Dependency-Track server.');
-            const responseBody = response.data;
-            return responseBody;
+        try {
+            const response = yield (0, axios_1.default)(requestConfig);
+            if (response.status >= 200 && response.status < 300) {
+                core.debug('Finished uploading BOM to Dependency-Track server.');
+                const responseBody = response.data;
+                return responseBody;
+            }
+            else {
+                core.debug('Failed uploading BOM to Dependency-Track server. Response status code: ' + response.status + ', status text: ' + response.statusText);
+                core.debug('Failed response data is ' + response.data);
+                throw new Error('Failed to upload bom to dependency Track server');
+            }
         }
-        else {
-            core.debug('Failed uploading BOM to Dependency-Track server. Response status code: ' + response.status + ', status text: ' + response.statusText);
-            core.debug('Failed response data is ' + response.data);
-            throw new Error('Failed to upload bom to dependency Track server');
+        catch (error) {
+            const context = {
+                status: (_a = error.response) === null || _a === void 0 ? void 0 : _a.status,
+                body: bomApiPayload
+            };
+            throw new Error('Failed to upload bom to dependency Track server. ' + JSON.stringify(context));
         }
     });
 }
@@ -435,6 +445,12 @@ function run() {
                 autoCreate: core.getInput('autocreate') != 'false',
                 bomFilePath: core.getInput('bomFilePath'),
             };
+            if (!dependecyTrackInputs.projectVersion) {
+                throw new Error('projectVersion input is required');
+            }
+            if (!dependecyTrackInputs.projectName) {
+                throw new Error('projectName input is required');
+            }
             // upload bom to dependency track server
             const bomUploadToken = (yield (0, dependencyTrack_1.uploadBomFileToDepndencyTrack)(dependecyTrackInputs)).token;
             // call hasBOMAnalysisCompleted every second, until timeout(in seconds) and then get out
@@ -468,6 +484,7 @@ function run() {
                     core.setFailed(`Found CVE vulnerabilities in project with severity level ${severityLevel} and above.`);
                 }
             }
+            core.setFailed('');
         }
         catch (error) {
             core.info((0, util_1.inspect)(error));

@@ -21,6 +21,14 @@ async function run(): Promise<void> {
             bomFilePath: core.getInput('bomFilePath'),
         }
 
+        if (!dependecyTrackInputs.projectVersion) {
+            throw new Error('projectVersion input is required');
+        }
+
+        if (!dependecyTrackInputs.projectName) {
+            throw new Error('projectName input is required');
+        }
+
         // upload bom to dependency track server
         const bomUploadToken: string = (await uploadBomFileToDepndencyTrack(dependecyTrackInputs)).token;
 
@@ -61,6 +69,7 @@ async function run(): Promise<void> {
             }
         }
 
+        core.setFailed('')
     } catch (error: any) {
         core.info(inspect(error));
         core.setFailed(error.message);
