@@ -1,5 +1,5 @@
 
-# Dependency track Github Action
+# Dependency track GitHub Action
 
 This action uploads a software bill of materials file to a Dependency-Track server and retrieves vulnerability information and outputs to PR if the github action is triggered for a pull request.
 
@@ -53,7 +53,7 @@ Possible Values are one of CRITICAL, HIGH, MEDIUM, LOW. Example: If `MEDIUM` the
 ## Example usage for on pull request
 
 ```yaml
-uses: neerajsu/dependency-track-gh-action@v1.0.4
+uses: adwise/dependency-track-gh-action@v1.0.0
 with:
   serverHostBaseUrl: 'https://depedency.server.url.company.com'
   apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
@@ -68,7 +68,7 @@ with:
 ## Example usage for on push
 
 ```yaml
-uses: neerajsu/dependency-track-gh-action@v1.0.4
+uses: adwise/dependency-track-gh-action@v1.0.0
 with:
   serverHostBaseUrl: 'https://depedency.server.url.company.com'
   apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
