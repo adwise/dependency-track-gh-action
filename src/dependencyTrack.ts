@@ -82,7 +82,7 @@ export interface Attribution {
  * @returns : BOM analysis token
  */
 export async function uploadBomFileToDepndencyTrack(input: DependencyTrackInputs): Promise<UploadBomResponseBody> {
-    core.info(`Reading BOM: ${input.bomFilePath}...`);
+    core.debug(`Reading BOM: ${input.bomFilePath}...`);
     const bomContentsBuffer: Buffer = readFileSync(input.bomFilePath);
     let base64EncodedBomContents: string = Buffer.from(bomContentsBuffer).toString('base64');
     if (base64EncodedBomContents.startsWith('77u/')) {
