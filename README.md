@@ -50,6 +50,13 @@ GITHUB_TOKEN or a repo scoped PAT. Default value is `${{ github.token }}`
 Possible Values are one of CRITICAL, HIGH, MEDIUM, LOW. Example: If `MEDIUM` then all vulnerabilities from MEDIUM and above fail check/task. If omitted, it will not fail check on any vulnerabilities found. PR will still show all vulnerabilities.
 
 
+## Permissions
+This action requires an API key with the following permissions in Dependency-Track:
+- BOM_UPLOAD
+- PROJECT_CREATION_UPLOAD
+- VIEW_VULNERABILITY
+- VIEW_PORTFOLIO
+
 ## Example usage for on pull request
 
 ```yaml
