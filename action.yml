@@ -38,6 +38,9 @@ inputs:
   failOnSeverityLevel:
     description: "Possible Values are one of CRITICAL, HIGH, MEDIUM, LOW"
     required: false
+  tags:
+    description: "Comma separated list of tags to add to the project in Dependency-Track if autocreate is true"
+    required: false
 runs:
   using: "node12"
   main: "dist/index.js"
