@@ -10,6 +10,7 @@ export interface DependencyTrackInputs {
     projectVersion: string
     autoCreate: boolean
     bomFilePath: string
+    tags?: string
 }
 
 export interface ProjectInfo {
@@ -18,6 +19,11 @@ export interface ProjectInfo {
     uuid: string,
     lastBomImportFormat?: string,
     active?: boolean
+    tags: Tag[]
+}
+
+export interface Tag {
+    name: string
 }
 
 export interface UploadBomResponseBody {
@@ -89,11 +95,22 @@ export async function uploadBomFileToDepndencyTrack(input: DependencyTrackInputs
         base64EncodedBomContents = base64EncodedBomContents.substring(4);
     }
 
+    let tags: Tag[] = [];
+
+    if (input.tags) {
+        tags = input.tags
+            .split(',')
+            .map(tag => ({
+                name: tag.trim()
+            }));
+    }
+
     const bomApiPayload = {
         projectName: input.projectName,
         projectVersion: input.projectVersion,
         autoCreate: input.autoCreate,
-        bom: base64EncodedBomContents
+        bom: base64EncodedBomContents,
+        tags: tags,
     }
 
     const bomApiPayloadJsonString = JSON.stringify(bomApiPayload);

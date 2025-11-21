@@ -10,8 +10,7 @@ const commentAuthor = 'github-actions[bot]';
 
 async function run(): Promise<void> {
     try {
-
-        // capturing inputs from github workflow task
+        // capturing inputs from GitHub workflow task
         const dependecyTrackInputs: DependencyTrackInputs = {
             serverHostBaseUrl: core.getInput('serverHostBaseUrl'),
             apiKey: core.getInput('apikey'),
@@ -19,6 +18,7 @@ async function run(): Promise<void> {
             projectVersion: core.getInput('projectversion'),
             autoCreate: core.getInput('autocreate') != 'false',
             bomFilePath: core.getInput('bomFilePath'),
+            tags: core.getInput('tags'),
         }
 
         if (!dependecyTrackInputs.projectVersion) {
@@ -66,7 +66,7 @@ async function run(): Promise<void> {
         const projectFindings: ProjectFinding[] = await getProjectFindings(dependecyTrackInputs);
 
         if (projectFindings.length) {
-            core.info('Project vulneribility findings are below. \n ' + JSON.stringify(projectFindings));
+            core.info('Project vulnerability findings are below. \n ' + JSON.stringify(projectFindings));
         } else {
             core.info('No project vulnerability findings found.');
         }
