@@ -14,6 +14,9 @@ inputs:
   projectversion:
     description: "Project version in Dependency-Track"
     required: true
+  projectTags:
+    description: "Comma separated list of tags to add to the project in Dependency-Track if autocreate is true"
+    required: false
   autocreate:
     description: "Automatically create the project in Dependency-Track if it doesn't exist"
     default: "false"
@@ -37,9 +40,6 @@ inputs:
     default: ${{ github.token }}
   failOnSeverityLevel:
     description: "Possible Values are one of CRITICAL, HIGH, MEDIUM, LOW"
-    required: false
-  tags:
-    description: "Comma separated list of tags to add to the project in Dependency-Track if autocreate is true"
     required: false
 runs:
   using: "node12"

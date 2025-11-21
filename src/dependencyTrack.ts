@@ -10,7 +10,7 @@ export interface DependencyTrackInputs {
     projectVersion: string
     autoCreate: boolean
     bomFilePath: string
-    tags?: string
+    projectTags?: string
 }
 
 export interface ProjectInfo {
@@ -97,8 +97,8 @@ export async function uploadBomFileToDepndencyTrack(input: DependencyTrackInputs
 
     let tags: Tag[] = [];
 
-    if (input.tags) {
-        tags = input.tags
+    if (input.projectTags) {
+        tags = input.projectTags
             .split(',')
             .map(tag => ({
                 name: tag.trim()

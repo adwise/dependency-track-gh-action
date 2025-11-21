@@ -16,9 +16,9 @@ async function run(): Promise<void> {
             apiKey: core.getInput('apikey'),
             projectName: core.getInput('projectname'),
             projectVersion: core.getInput('projectversion'),
+            projectTags: core.getInput('projectTags'),
             autoCreate: core.getInput('autocreate') != 'false',
             bomFilePath: core.getInput('bomFilePath'),
-            tags: core.getInput('tags'),
         }
 
         if (!dependecyTrackInputs.projectVersion) {
@@ -37,10 +37,7 @@ async function run(): Promise<void> {
         core.info('Using project name: ' + dependecyTrackInputs.projectName);
         core.info('Using project version: ' + dependecyTrackInputs.projectVersion);
         core.info('Using apiKey (last 5 char only): ' + dependecyTrackInputs.apiKey.slice(-5));
-
-        if (dependecyTrackInputs.tags) {
-            core.info('Using tags: ' + dependecyTrackInputs.tags);
-        }
+        core.info('Using tags: ' + dependecyTrackInputs.projectTags);
 
         core.info('Uploading the following BOM file to dependency track server: ' + dependecyTrackInputs.bomFilePath);
 
