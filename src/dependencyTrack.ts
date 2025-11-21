@@ -110,7 +110,7 @@ export async function uploadBomFileToDepndencyTrack(input: DependencyTrackInputs
         projectVersion: input.projectVersion,
         autoCreate: input.autoCreate,
         bom: base64EncodedBomContents,
-        tags: tags,
+        projectTags: tags,
     }
 
     const bomApiPayloadJsonString = JSON.stringify(bomApiPayload);
