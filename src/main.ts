@@ -38,6 +38,10 @@ async function run(): Promise<void> {
         core.info('Using project version: ' + dependecyTrackInputs.projectVersion);
         core.info('Using apiKey (last 5 char only): ' + dependecyTrackInputs.apiKey.slice(-5));
 
+        if (dependecyTrackInputs.tags) {
+            core.info('Using tags: ' + dependecyTrackInputs.tags);
+        }
+
         core.info('Uploading the following BOM file to dependency track server: ' + dependecyTrackInputs.bomFilePath);
 
         // upload bom to dependency track server
