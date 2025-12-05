@@ -25,7 +25,7 @@ inputs:
     description: "Path with filename of the BOM"
     required: true
   timeoutInSecs:
-    description: "Path with filename of the BOM"
+    description: "Timeout in seconds for the BOM upload request"
     required: true
   prNumber:
     description: "Pull request number. Required for [on : pull_request]."

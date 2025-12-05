@@ -143,6 +143,7 @@ export async function uploadBomFileToDepndencyTrack(input: DependencyTrackInputs
         bomApiPayload.bom = '<<omitted from logs>>';
         const context = {
             status: error.response?.status,
+            message: error.response?.body,
             body: bomApiPayload
         };
         throw new Error('Failed to upload bom to dependency Track server. ' + JSON.stringify(context));
